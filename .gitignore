@@ -1,2 +1,7 @@
 data/raw/*.csv
 data/raw/.ipynb_checkpoints/
+data/
+models/
+notebooks/models/
+**/__pycache__/
+**/*.pyc
