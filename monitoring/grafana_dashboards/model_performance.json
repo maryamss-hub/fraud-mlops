@@ -1,0 +1,60 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "id": null,
+  "panels": [
+    {
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "id": 1,
+      "targets": [{ "expr": "fraud_model_recall", "legendFormat": "recall", "refId": "A" }],
+      "title": "Recall over time",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "id": 2,
+      "targets": [{ "expr": "1 - fraud_api_error_rate", "legendFormat": "proxy precision", "refId": "A" }],
+      "title": "Precision over time (proxy)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "id": 3,
+      "targets": [
+        {
+          "expr": "sum(rate(fraud_api_requests_total{endpoint=\"/predict\",status=\"ok\"}[5m]))",
+          "legendFormat": "predictions req/s",
+          "refId": "A"
+        }
+      ],
+      "title": "Fraud detection rate (request volume proxy)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "id": 4,
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.5, sum(rate(fraud_api_latency_seconds_bucket[5m])) by (le))",
+          "legendFormat": "latency p50",
+          "refId": "A"
+        }
+      ],
+      "title": "Prediction confidence distribution (latency proxy)",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 36,
+  "tags": ["fraud", "mlops", "model"],
+  "templating": { "list": [] },
+  "time": { "from": "now-6h", "to": "now" },
+  "timezone": "browser",
+  "title": "Fraud MLOps - Model Performance",
+  "uid": "fraud-model-performance",
+  "version": 1
+}

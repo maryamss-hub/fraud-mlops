@@ -1,0 +1,58 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "id": null,
+  "panels": [
+    {
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 0 },
+      "id": 1,
+      "targets": [
+        {
+          "expr": "feature_drift_score",
+          "legendFormat": "max PSI",
+          "refId": "A"
+        }
+      ],
+      "title": "PSI score per feature (max drift score)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "id": 2,
+      "targets": [
+        {
+          "expr": "sum(rate(fraud_api_requests_total{status=\"error\"}[5m]))",
+          "legendFormat": "error req/s",
+          "refId": "A"
+        }
+      ],
+      "title": "Missing value rate (proxy via errors)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "id": 3,
+      "targets": [
+        {
+          "expr": "ALERTS{alertname=~\"DataDrift\"}",
+          "legendFormat": "{{alertname}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Drift alert history",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 36,
+  "tags": ["fraud", "mlops", "drift"],
+  "templating": { "list": [] },
+  "time": { "from": "now-24h", "to": "now" },
+  "timezone": "browser",
+  "title": "Fraud MLOps - Data Drift",
+  "uid": "fraud-data-drift",
+  "version": 1
+}

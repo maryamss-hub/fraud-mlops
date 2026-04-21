@@ -1,0 +1,52 @@
+groups:
+  - name: fraud-mlops-recording
+    rules:
+      - record: fraud_api_latency_seconds_p99
+        expr: |
+          histogram_quantile(
+            0.99,
+            sum(rate(fraud_api_latency_seconds_bucket[5m])) by (le)
+          )
+      - record: fraud_api_error_rate
+        expr: |
+          sum(rate(fraud_api_requests_total{status="error"}[5m]))
+          /
+          sum(rate(fraud_api_requests_total[5m]))
+
+  - name: fraud-mlops-alerts
+    rules:
+      - alert: LowRecall
+        expr: fraud_model_recall < 0.80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Fraud model recall is low"
+          description: "fraud_model_recall has been below 0.80 for 5 minutes."
+
+      - alert: DataDrift
+        expr: feature_drift_score > 0.2
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Feature drift detected"
+          description: "feature_drift_score has been above 0.2 for 10 minutes."
+
+      - alert: HighLatency
+        expr: fraud_api_latency_seconds_p99 > 0.5
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High API latency (p99)"
+          description: "fraud_api_latency_seconds_p99 has been above 0.5s for 2 minutes."
+
+      - alert: HighErrorRate
+        expr: rate(fraud_api_requests_total{status="error"}[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High API error rate"
+          description: "Error request rate exceeds 0.05 req/s over 5 minutes."

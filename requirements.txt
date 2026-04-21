@@ -1,0 +1,24 @@
+pandas
+numpy
+scikit-learn
+xgboost
+lightgbm
+imbalanced-learn
+category_encoders
+shap
+kfp
+# NOTE: The PyPI package for Kubeflow Pipelines is `kfp`.
+# Some environments reference "kubeflow-pipelines" colloquially, but it is not
+# published on PyPI as an installable distribution name.
+fastapi
+uvicorn
+prometheus-client
+great_expectations
+pytest
+flake8
+matplotlib
+seaborn
+scipy
+joblib
+pydantic
+httpx
