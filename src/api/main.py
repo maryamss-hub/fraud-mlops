@@ -10,7 +10,13 @@ import joblib
 import numpy as np
 import pandas as pd
 from fastapi import FastAPI, HTTPException, Request, Response
-from prometheus_client import CONTENT_TYPE_LATEST, Counter, Gauge, Histogram, generate_latest
+from prometheus_client import (
+    CONTENT_TYPE_LATEST,
+    Counter,
+    Gauge,
+    Histogram,
+    generate_latest,
+)
 from sklearn.dummy import DummyClassifier
 
 from src.api.schemas import HealthResponse, PredictRequest, PredictResponse
@@ -104,7 +110,9 @@ async def _metrics_middleware(request: Request, call_next):
         fraud_api_requests_total.labels(endpoint=endpoint, status="error").inc()
         raise
     finally:
-        fraud_api_latency_seconds.labels(endpoint=endpoint).observe(time.perf_counter() - start)
+        fraud_api_latency_seconds.labels(endpoint=endpoint).observe(
+            time.perf_counter() - start
+        )
 
 
 @app.get("/health", response_model=HealthResponse)
@@ -132,7 +140,11 @@ def predict(req: PredictRequest) -> PredictResponse:
         prob = float(max(0.0, min(1.0, pred)))
 
     prediction = int(prob >= 0.5)
-    return PredictResponse(fraud_probability=prob, prediction=prediction, model_version=MODEL_VERSION)
+    return PredictResponse(
+        fraud_probability=prob,
+        prediction=prediction,
+        model_version=MODEL_VERSION,
+    )
 
 
 @app.get("/metrics")

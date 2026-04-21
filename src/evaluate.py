@@ -142,9 +142,24 @@ def business_impact_analysis(
 
     table = pd.DataFrame(
         [
-            {"item": "False Negatives (missed fraud)", "count": int(fn), "unit_cost": fn_cost, "total_cost": fraud_loss},
-            {"item": "False Positives (false alarms)", "count": int(fp), "unit_cost": fp_cost, "total_cost": false_alarm_cost},
-            {"item": "Total", "count": int(fp + fn), "unit_cost": np.nan, "total_cost": total},
+            {
+                "item": "False Negatives (missed fraud)",
+                "count": int(fn),
+                "unit_cost": fn_cost,
+                "total_cost": fraud_loss,
+            },
+            {
+                "item": "False Positives (false alarms)",
+                "count": int(fp),
+                "unit_cost": fp_cost,
+                "total_cost": false_alarm_cost,
+            },
+            {
+                "item": "Total",
+                "count": int(fp + fn),
+                "unit_cost": np.nan,
+                "total_cost": total,
+            },
         ]
     )
     with pd.option_context("display.max_columns", None, "display.width", 120):

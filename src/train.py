@@ -185,7 +185,11 @@ def train_hybrid(
     )
     xgb.fit(X_sel, np.asarray(y_train))
 
-    hybrid = HybridModel(selected_features=selected_features, selector=selector, model=xgb)
+    hybrid = HybridModel(
+        selected_features=selected_features,
+        selector=selector,
+        model=xgb,
+    )
     _ensure_models_dir()
     joblib.dump(hybrid, os.path.join("models", "hybrid.joblib"))
     return hybrid
@@ -232,7 +236,12 @@ def compare_imbalance_strategies(
         # Sample for SMOTE only — use stratified sample of 20000 rows
         sample_idx = (
             X_tr_df.groupby(y_tr_s)
-            .apply(lambda x: x.sample(min(len(x), 10000), random_state=42))
+            .apply(
+                lambda x: x.sample(
+                    min(len(x), 10000),
+                    random_state=42,
+                )
+            )
             .index.get_level_values(1)
         )
         X_tr_sample = X_tr_df.loc[sample_idx]
@@ -299,7 +308,9 @@ def compare_imbalance_strategies(
 
 
 def _synthetic_dataset(
-    n_rows: int = 500, n_features: int = 20, fraud_rate: float = 0.05
+    n_rows: int = 500,
+    n_features: int = 20,
+    fraud_rate: float = 0.05,
 ) -> Tuple[pd.DataFrame, pd.Series]:
     """Generate a small synthetic dataset for local runs without the real data."""
     rng = np.random.default_rng(42)
@@ -319,7 +330,9 @@ def main(argv: Optional[List[str]] = None) -> int:
     if args.data_csv:
         df = pd.read_csv(args.data_csv)
         if args.target_col not in df.columns:
-            raise ValueError(f"Target column '{args.target_col}' not found in {args.data_csv}")
+            raise ValueError(
+                f"Target column '{args.target_col}' not found in {args.data_csv}"
+            )
         X = df.drop(columns=[args.target_col])
         y = df[args.target_col].astype(int)
     else:
@@ -332,7 +345,10 @@ def main(argv: Optional[List[str]] = None) -> int:
     _ = compare_imbalance_strategies(X_train, y_train, X_test, y_test)
     train_xgboost(X_train, y_train, cost_sensitive=False)
     train_lightgbm(X_train, y_train, cost_sensitive=False)
-    train_hybrid(pd.DataFrame(X_train, columns=getattr(X, "columns", None)), y_train)
+    train_hybrid(
+        pd.DataFrame(X_train, columns=getattr(X, "columns", None)),
+        y_train,
+    )
     return 0
 
 

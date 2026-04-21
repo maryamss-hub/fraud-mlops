@@ -17,7 +17,10 @@ from src.train import (
 
 def _make_data(n_rows: int = 100, n_features: int = 10):
     rng = np.random.default_rng(123)
-    X = pd.DataFrame(rng.normal(size=(n_rows, n_features)), columns=[f"f{i}" for i in range(n_features)])
+    X = pd.DataFrame(
+        rng.normal(size=(n_rows, n_features)),
+        columns=[f"f{i}" for i in range(n_features)],
+    )
     y = pd.Series((rng.random(n_rows) < 0.12).astype(int))
     return X, y
 

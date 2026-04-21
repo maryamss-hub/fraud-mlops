@@ -70,7 +70,12 @@ def standard_vs_costsensitive_comparison(
     def _row(name: str, model: XGBClassifier) -> Dict[str, float]:
         prob = model.predict_proba(np.asarray(X_test))[:, 1]
         pred = (prob >= 0.5).astype(int)
-        impact = business_impact_analysis(y_true, pred, fn_cost=500.0, fp_cost=10.0)
+        impact = business_impact_analysis(
+            y_true,
+            pred,
+            fn_cost=500.0,
+            fp_cost=10.0,
+        )
         return {
             "model": name,
             "precision": float(precision_score(y_true, pred, zero_division=0)),

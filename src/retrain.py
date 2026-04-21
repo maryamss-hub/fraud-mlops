@@ -4,17 +4,8 @@ from __future__ import annotations
 
 import csv
 import os
-from dataclasses import dataclass
 from datetime import date, datetime, timedelta
 from typing import Dict, Optional, Tuple
-
-import joblib
-import numpy as np
-import pandas as pd
-from lightgbm import LGBMClassifier
-from sklearn.metrics import recall_score, roc_auc_score
-from sklearn.model_selection import train_test_split
-from xgboost import XGBClassifier
 
 
 def threshold_based_retrain(current_recall: float, threshold: float = 0.80) -> bool:
@@ -46,6 +37,10 @@ def _train_candidates(
     y_train: pd.Series | np.ndarray,
 ) -> Dict[str, object]:
     """Train a small set of candidate models."""
+    import numpy as np
+    from lightgbm import LGBMClassifier
+    from xgboost import XGBClassifier
+
     xgb = XGBClassifier(
         n_estimators=400,
         max_depth=6,
@@ -93,6 +88,11 @@ def run_retrain_pipeline(
     Returns:
         (best_model, metrics_dict)
     """
+    import joblib
+    import numpy as np
+    from sklearn.metrics import recall_score, roc_auc_score
+    from sklearn.model_selection import train_test_split
+
     os.makedirs("models", exist_ok=True)
     os.makedirs("logs", exist_ok=True)
 
@@ -130,7 +130,12 @@ def run_retrain_pipeline(
     joblib.dump(best_model, versioned_path)
     joblib.dump(best_model, latest_path)
 
-    metrics = {"timestamp_utc": ts, "best_model": best_name, "auc_roc": best_auc, "recall": best_recall}
+    metrics = {
+        "timestamp_utc": ts,
+        "best_model": best_name,
+        "auc_roc": best_auc,
+        "recall": best_recall,
+    }
     log_path = os.path.join("logs", "retrain_log.csv")
     write_header = not os.path.exists(log_path)
     with open(log_path, "a", newline="", encoding="utf-8") as f:
@@ -144,35 +149,43 @@ def run_retrain_pipeline(
     return best_model, {"auc_roc": best_auc, "recall": best_recall}
 
 
-def compare_strategies_report() -> pd.DataFrame:
-    """Print a simple qualitative comparison of retraining strategies."""
-    table = pd.DataFrame(
-        [
-            {
-                "strategy": "threshold-based",
-                "stability": "medium",
-                "cost": "medium",
-                "performance": "high when monitored",
-                "notes": "Retrains only on metric degradation; needs reliable monitoring.",
-            },
-            {
-                "strategy": "periodic",
-                "stability": "high",
-                "cost": "high",
-                "performance": "medium",
-                "notes": "Simple schedule; may retrain unnecessarily when data is stable.",
-            },
-            {
-                "strategy": "hybrid",
-                "stability": "high",
-                "cost": "medium",
-                "performance": "high",
-                "notes": "Emergency retrain on severe drop plus periodic refresh.",
-            },
-        ]
-    ).set_index("strategy")
-    with pd.option_context("display.max_columns", None, "display.width", 140):
-        print("\n=== Retraining Strategy Comparison ===")
-        print(table)
-    return table
+def compare_strategies_report() -> list[dict[str, str]]:
+    """Print a simple qualitative comparison of retraining strategies.
+
+    Returns:
+        List of row dicts describing each strategy.
+    """
+    rows: list[dict[str, str]] = [
+        {
+            "strategy": "threshold-based",
+            "stability": "medium",
+            "cost": "medium",
+            "performance": "high when monitored",
+            "notes": "Retrains only on metric degradation; needs reliable monitoring.",
+        },
+        {
+            "strategy": "periodic",
+            "stability": "high",
+            "cost": "high",
+            "performance": "medium",
+            "notes": "Simple schedule; may retrain unnecessarily when data is stable.",
+        },
+        {
+            "strategy": "hybrid",
+            "stability": "high",
+            "cost": "medium",
+            "performance": "high",
+            "notes": "Emergency retrain on severe drop plus periodic refresh.",
+        },
+    ]
+
+    headers = ["strategy", "stability", "cost", "performance", "notes"]
+    widths = {h: max(len(h), max(len(r[h]) for r in rows)) for h in headers}
+
+    print("\n=== Retraining Strategy Comparison ===")
+    print(" | ".join(h.ljust(widths[h]) for h in headers))
+    print("-+-".join("-" * widths[h] for h in headers))
+    for r in rows:
+        print(" | ".join(r[h].ljust(widths[h]) for h in headers))
+    return rows
 

@@ -1,0 +1,4 @@
+Strategy,Trigger Condition,Compute Cost,Stability,When to Use
+Threshold-based,"Metric (e.g., recall) drops below threshold",Medium,Medium,Strong monitoring + stable traffic; retrain only when needed
+Periodic,"Fixed schedule (e.g., weekly/monthly)",High,High,Regulated/strict cadence or predictable drift patterns
+Hybrid,Emergency threshold OR periodic schedule,Medium,High,Best default: combines safety net with cadence

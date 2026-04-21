@@ -13,7 +13,13 @@ class PredictRequest(BaseModel):
     features: Dict[str, Any] = Field(
         ...,
         description="Transaction features as a JSON object (feature_name -> value).",
-        examples=[{"TransactionAmt": 123.45, "card1": 1000, "DeviceType": "desktop"}],
+        examples=[
+            {
+                "TransactionAmt": 123.45,
+                "card1": 1000,
+                "DeviceType": "desktop",
+            }
+        ],
     )
 
 

@@ -78,9 +78,16 @@ def detect_feature_drift(
 
     drifted_features = [c for c, v in report.items() if v["psi"] > threshold]
     report["_summary"] = {
-        "num_features_checked": float(len([c for c in num_cols if c in df_test.columns])),
+        "num_features_checked": float(
+            len([c for c in num_cols if c in df_test.columns])
+        ),
         "num_drifted": float(len(drifted_features)),
-        "max_psi": float(max((v["psi"] for k, v in report.items() if k != "_summary"), default=0.0)),
+        "max_psi": float(
+            max(
+                (v["psi"] for k, v in report.items() if k != "_summary"),
+                default=0.0,
+            )
+        ),
     }
     return report
 
@@ -120,7 +127,9 @@ def simulate_time_drift(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
     if fraud_idx.size > 0 and "TransactionAmt" in df_test.columns:
         n_amt = int(np.ceil(0.30 * fraud_idx.size))
         chosen = rng.choice(fraud_idx, size=min(n_amt, fraud_idx.size), replace=False)
-        df_test.loc[chosen, "TransactionAmt"] = df_test.loc[chosen, "TransactionAmt"].astype(float) * 3.0
+        df_test.loc[chosen, "TransactionAmt"] = (
+            df_test.loc[chosen, "TransactionAmt"].astype(float) * 3.0
+        )
 
     device_col = "DeviceType"
     if device_col not in df_test.columns:

@@ -18,7 +18,13 @@ def test_health_endpoint():
 
 def test_predict_endpoint_returns_probability():
     client = TestClient(app)
-    payload = {"features": {"f0": 0.1, "f1": -0.2, "TransactionAmt": 123.45}}
+    payload = {
+        "features": {
+            "f0": 0.1,
+            "f1": -0.2,
+            "TransactionAmt": 123.45,
+        }
+    }
     r = client.post("/predict", json=payload)
     assert r.status_code == 200
     body = r.json()

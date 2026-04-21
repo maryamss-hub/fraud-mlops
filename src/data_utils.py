@@ -130,7 +130,10 @@ def encode_categoricals(df: pd.DataFrame, target_col: str) -> pd.DataFrame:
             continue
         is_cat = isinstance(out[col].dtype, pd.CategoricalDtype)
         if pd.api.types.is_object_dtype(out[col]) or is_cat:
-            codes, _uniques = pd.factorize(out[col].astype(str).fillna("Unknown"), sort=True)
+            codes, _uniques = pd.factorize(
+                out[col].astype(str).fillna("Unknown"),
+                sort=True,
+            )
             out[col] = codes.astype(np.int32)
 
     return out
@@ -158,7 +161,10 @@ def get_feature_target_split(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Series]
     for col in X.columns:
         is_cat = isinstance(X[col].dtype, pd.CategoricalDtype)
         if pd.api.types.is_object_dtype(X[col]) or is_cat:
-            codes, _uniques = pd.factorize(X[col].astype(str).fillna("Unknown"), sort=True)
+            codes, _uniques = pd.factorize(
+                X[col].astype(str).fillna("Unknown"),
+                sort=True,
+            )
             X[col] = codes.astype(np.int32)
     return X, y
 
