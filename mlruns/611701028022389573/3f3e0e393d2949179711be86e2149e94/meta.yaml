@@ -1,0 +1,14 @@
+artifact_uri: file:///D:/mlops4/fraud-mlops/mlruns/611701028022389573/3f3e0e393d2949179711be86e2149e94/artifacts
+end_time: 1776926872578
+entry_point_name: ''
+experiment_id: '611701028022389573'
+lifecycle_stage: active
+run_id: 3f3e0e393d2949179711be86e2149e94
+run_name: Feature Engineering
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1776926860483
+status: 3
+tags: []
+user_id: frost

@@ -1,0 +1,6 @@
+experiment_name: fraud-detection
+# Set to a local file store for easy setup on Windows.
+tracking_uri: file:///D:/mlops4/fraud-mlops/mlruns
+# Used by MLflow when creating the experiment (file store).
+artifact_location: file:///D:/mlops4/fraud-mlops/mlruns
+

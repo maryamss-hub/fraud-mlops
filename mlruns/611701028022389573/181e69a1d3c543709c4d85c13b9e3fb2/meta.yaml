@@ -1,0 +1,14 @@
+artifact_uri: file:///D:/mlops4/fraud-mlops/mlruns/611701028022389573/181e69a1d3c543709c4d85c13b9e3fb2/artifacts
+end_time: 1776924832009
+entry_point_name: ''
+experiment_id: '611701028022389573'
+lifecycle_stage: active
+run_id: 181e69a1d3c543709c4d85c13b9e3fb2
+run_name: Model Training
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1776924766383
+status: 3
+tags: []
+user_id: frost

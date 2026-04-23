@@ -1,0 +1,14 @@
+artifact_uri: file:///D:/mlops4/fraud-mlops/mlruns/611701028022389573/f489b652ac654f21ba7dd43443fa6745/artifacts
+end_time: 1776924835924
+entry_point_name: ''
+experiment_id: '611701028022389573'
+lifecycle_stage: active
+run_id: f489b652ac654f21ba7dd43443fa6745
+run_name: fraud-mlflow-pipeline
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1776924518620
+status: 3
+tags: []
+user_id: frost

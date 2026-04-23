@@ -1,0 +1,14 @@
+artifact_uri: file:///D:/mlops4/fraud-mlops/mlruns/611701028022389573/5da4125dd783465a96d4e4f5b6d85588/artifacts
+end_time: 1776926577092
+entry_point_name: ''
+experiment_id: '611701028022389573'
+lifecycle_stage: active
+run_id: 5da4125dd783465a96d4e4f5b6d85588
+run_name: Preprocessing
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1776926509835
+status: 3
+tags: []
+user_id: frost

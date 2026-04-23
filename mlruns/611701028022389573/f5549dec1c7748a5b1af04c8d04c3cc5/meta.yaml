@@ -1,0 +1,14 @@
+artifact_uri: file:///D:/mlops4/fraud-mlops/mlruns/611701028022389573/f5549dec1c7748a5b1af04c8d04c3cc5/artifacts
+end_time: 1776925272029
+entry_point_name: ''
+experiment_id: '611701028022389573'
+lifecycle_stage: active
+run_id: f5549dec1c7748a5b1af04c8d04c3cc5
+run_name: Conditional Deployment
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1776925271939
+status: 3
+tags: []
+user_id: frost
