@@ -201,5 +201,4 @@ Grafana dashboards (importable JSON):
 - `notebooks/02_modeling.ipynb`
 - `notebooks/03_explainability.ipynb`
 
-These notebooks run on **synthetic data by default** so you can execute them even without the IEEE-CIS files.
 
