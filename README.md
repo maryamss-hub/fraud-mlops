@@ -1,4 +1,4 @@
-## Fraud MLOps (IEEE-CIS) — End-to-End Project
+## Fraud MLOps (IEEE-CIS)
 
 This repository is a complete (assignment-friendly) MLOps fraud detection system built around the **IEEE-CIS Fraud Detection** dataset. It includes:
 
