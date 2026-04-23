@@ -66,47 +66,6 @@ jobs:
           push: true
           tags: ghcr.io/${{ github.repository }}/fraud-inference:latest
 
-  deploy-kubeflow:
-    needs: build-docker
-    runs-on: ubuntu-latest
-    if: github.event_name != 'workflow_dispatch'
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.10"
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-      - name: Compile pipeline spec
-        run: |
-          python pipelines/pipeline.py
-      - name: Trigger Kubeflow pipeline run
-        env:
-          KFP_HOST: ${{ secrets.KFP_HOST }}
-          KFP_NAMESPACE: ${{ secrets.KFP_NAMESPACE }}
-          KFP_EXPERIMENT: ${{ secrets.KFP_EXPERIMENT }}
-        run: |
-          python - <<'PY'
-          import os
-          from kfp import Client
-          host = os.environ.get("KFP_HOST")
-          namespace = os.environ.get("KFP_NAMESPACE", "fraud-detection")
-          experiment_name = os.environ.get("KFP_EXPERIMENT", "fraud-mlops")
-          if not host:
-              raise SystemExit("KFP_HOST secret is required to trigger a pipeline run.")
-          client = Client(host=host, namespace=namespace)
-          exp = client.create_experiment(name=experiment_name, namespace=namespace)
-          run = client.create_run_from_pipeline_package(
-              "pipelines/fraud_pipeline.yaml",
-              arguments={"transactions_csv": "transactions.csv", "identity_csv": "identity.csv"},
-              experiment_id=exp.experiment_id,
-              run_name="fraud-mlops-ci-run",
-          )
-          print(run.run_id)
-          PY
-
   intelligent-retrain:
     needs: lint-and-test
     runs-on: ubuntu-latest

@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fraud Detection MLOps Research Report</title>
+    <style>
+      :root {
+        --text: #111;
+        --muted: #555;
+        --border: #ddd;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        color: var(--text);
+        line-height: 1.5;
+        margin: 2.25rem;
+      }
+      h2 { margin-top: 2rem; }
+      h3 { margin-top: 1.25rem; color: var(--muted); }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 1rem 0;
+        font-size: 0.95rem;
+      }
+      th, td {
+        border: 1px solid var(--border);
+        padding: 0.5rem 0.6rem;
+        text-align: left;
+        vertical-align: top;
+      }
+      th { background: #fafafa; }
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+        font-size: 0.95em;
+      }
+      hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+    </style>
+  </head>
+  <body>
+    <h2 id="fraud-detection-mlops-research-report">Fraud Detection MLOps Research Report</h2>
+<h3 id="title-page">Title Page</h3>
+<ul>
+<li><strong>Course</strong>: MLOps BS DS  </li>
+<li><strong>Author</strong>: Maryam Khalid  </li>
+<li><strong>Date</strong>: April 2026  </li>
+</ul>
+<hr>
+<h2 id="abstract">Abstract</h2>
+<p>This report presents an end-to-end MLOps implementation for fraud detection using the IEEE-CIS style transaction dataset. The system covers pipeline orchestration and experiment tracking, robust data handling, model development and comparison, cost-sensitive optimization, CI/CD automation, monitoring and alerting, drift simulation, retraining strategy design, and model explainability. Due to resource constraints, the originally planned Kubeflow workflow was replaced with an MLflow-based implementation (approved by the instructor). Minikube infrastructure components were still deployed to demonstrate Kubernetes concepts, including a dedicated namespace, persistent volume claim (PVC), and resource quotas. Across the conducted experiments, LightGBM delivered the best overall performance among tested models, while cost-sensitive learning substantially reduced estimated business losses. Monitoring and drift detection confirmed the feasibility of continuous evaluation and retraining triggers in production-like settings.</p>
+<hr>
+<h2 id="system-architecture-overview">System Architecture Overview</h2>
+<p>The system architecture follows a standard MLOps lifecycle:</p>
+<ul>
+<li><strong>Data layer</strong>: Raw transactions and identity tables are ingested and merged; preprocessing addresses missingness and categorical encoding; feature engineering produces model-ready tabular features.</li>
+<li><strong>Experiment layer</strong>: MLflow tracks experiments and artifacts across seven nested pipeline stages.</li>
+<li><strong>Modeling layer</strong>: Candidate models (XGBoost, LightGBM, Hybrid RF+XGBoost) are trained and evaluated using classification metrics and AUC-ROC.</li>
+<li><strong>Optimization layer</strong>: Cost-sensitive training is applied to reduce false-negative business impact.</li>
+<li><strong>Delivery layer</strong>: CI/CD automates linting, testing, container builds, and (where applicable) deployment steps.</li>
+<li><strong>Observability layer</strong>: FastAPI serves inference; Prometheus collects metrics and evaluates alert rules; Grafana dashboards provide operational visibility.</li>
+<li><strong>Governance layer</strong>: Drift detection and retraining strategies define when to refresh the model; explainability supports transparency and stakeholder trust.</li>
+</ul>
+<p><strong>Dataset summary</strong>: 590k transactions, 3.49% fraud rate, 219 features.</p>
+<hr>
+<h2 id="task-1-mlflow-pipeline-setup">Task 1 — MLflow Pipeline Setup</h2>
+<p><strong>Important note (Task 1)</strong>: Kubeflow was replaced with MLflow (approved by instructor due to resource constraints). Minikube was still deployed with namespace, PVC and quotas.</p>
+<p><strong>Infrastructure and cluster constraints</strong>:</p>
+<ul>
+<li>Minikube deployed</li>
+<li>Namespace: <code>fraud-detection</code></li>
+<li>PVC: <code>fraud-artifacts-pvc</code> (10Gi, bound)</li>
+<li>Resource quotas: 4CPU / 8Gi</li>
+</ul>
+<p><strong>MLflow pipeline implementation</strong>:</p>
+<ul>
+<li>MLflow used for orchestration with experiment: <code>fraud-detection</code></li>
+<li>Seven nested MLflow runs (stages):</li>
+<li>Data Ingestion</li>
+<li>Data Validation</li>
+<li>Preprocessing</li>
+<li>Feature Engineering</li>
+<li>Model Training</li>
+<li>Model Evaluation</li>
+<li>Conditional Deployment</li>
+<li><strong>Model registration policy</strong>: model only registered if <strong>recall &gt; 0.85</strong></li>
+<li><strong>Artifacts logged</strong>: confusion matrix, ROC curve, SHAP plot</li>
+</ul>
+<hr>
+<h2 id="task-2-data-challenges">Task 2 — Data Challenges</h2>
+<p>The dataset presents typical fraud-detection constraints: class imbalance (3.49% fraud), heterogeneous feature types, missingness, and high-cardinality categoricals. The adopted data handling strategy was intentionally simple, explainable, and operationally robust:</p>
+<ul>
+<li><strong>Missing values</strong>:</li>
+<li>Numeric: median imputation</li>
+<li>Categorical: imputed as <code>"Unknown"</code></li>
+<li><strong>Categorical encoding</strong>:</li>
+<li>Target encoding for <strong>card1–card6</strong> and <strong>email domains</strong></li>
+</ul>
+<p>Two imbalance-handling strategies were evaluated with XGBoost:</p>
+<ul>
+<li><strong>SMOTE+XGBoost</strong>: Precision 0.197, Recall 0.823, F1 0.318, AUC 0.926  </li>
+<li><strong>ClassWeight+XGBoost</strong>: Precision 0.244, Recall 0.819, F1 0.376, AUC 0.937  </li>
+</ul>
+<p><strong>Result</strong>: ClassWeight performed better overall.</p>
+<hr>
+<h2 id="task-3-model-comparison">Task 3 — Model Comparison</h2>
+<p>Three model families were compared under a consistent evaluation protocol. The results show that high precision does not necessarily imply strong fraud capture; recall is critical due to the cost of missed fraud.</p>
+<h3 id="results-metrics">Results (metrics)</h3>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th style="text-align: right;">Precision</th>
+<th style="text-align: right;">Recall</th>
+<th style="text-align: right;">F1</th>
+<th style="text-align: right;">AUC</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LightGBM</td>
+<td style="text-align: right;">0.927</td>
+<td style="text-align: right;">0.530</td>
+<td style="text-align: right;">0.675</td>
+<td style="text-align: right;">0.957</td>
+</tr>
+<tr>
+<td>XGBoost</td>
+<td style="text-align: right;">0.905</td>
+<td style="text-align: right;">0.426</td>
+<td style="text-align: right;">0.580</td>
+<td style="text-align: right;">0.931</td>
+</tr>
+<tr>
+<td>Hybrid RF+XGBoost</td>
+<td style="text-align: right;">0.897</td>
+<td style="text-align: right;">0.413</td>
+<td style="text-align: right;">0.566</td>
+<td style="text-align: right;">0.926</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Result</strong>: LightGBM best overall.</p>
+<hr>
+<h2 id="task-4-cost-sensitive-learning">Task 4 — Cost-Sensitive Learning</h2>
+<p>Cost-sensitive learning targets asymmetric error costs, especially the large financial impact of false negatives in fraud detection. Two training configurations were compared.</p>
+<h3 id="business-impact-results">Business impact results</h3>
+<table>
+<thead>
+<tr>
+<th>Configuration</th>
+<th style="text-align: right;">Fraud loss</th>
+<th style="text-align: right;">False alarms</th>
+<th style="text-align: right;">Total</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Standard XGBoost</td>
+<td style="text-align: right;">$1,743,500</td>
+<td style="text-align: right;">$2,710</td>
+<td style="text-align: right;">$1,746,210</td>
+</tr>
+<tr>
+<td>Cost-sensitive XGBoost (scale_pos_weight=50)</td>
+<td style="text-align: right;">$389,000</td>
+<td style="text-align: right;">$256,440</td>
+<td style="text-align: right;">$645,440</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Result</strong>: 63% cost reduction.</p>
+<hr>
+<h2 id="task-5-cicd-pipeline">Task 5 — CI/CD Pipeline</h2>
+<p>The CI/CD system was implemented as a GitHub Actions pipeline with four stages and triggers on push and pull request:</p>
+<ul>
+<li><strong>4-stage pipeline</strong></li>
+<li><strong>lint-and-test</strong>: PASSED  </li>
+<li><strong>build-docker</strong>: PASSED (training + inference images built and pushed to GHCR)  </li>
+<li><strong>deploy-kubeflow</strong>: failed due to missing <code>KFP_HOST</code> secret (no live cluster — expected)  </li>
+<li><strong>intelligent-retrain</strong>: skipped  </li>
+</ul>
+<p>This design supports reproducibility (tests and linting), delivery automation (container builds), and controlled deployment behavior when external secrets or a cluster are unavailable.</p>
+<hr>
+<h2 id="task-6-monitoring-system">Task 6 — Monitoring System</h2>
+<p>Operational monitoring was implemented using FastAPI, Prometheus, and Grafana:</p>
+<ul>
+<li>FastAPI inference API running at <strong>port 8000</strong></li>
+<li>Prometheus metrics endpoint at <strong><code>/metrics</code></strong> exposing:</li>
+<li><code>fraud_api_requests_total</code></li>
+<li><code>fraud_api_latency_seconds</code></li>
+<li><code>fraud_model_recall</code></li>
+<li><code>feature_drift_score</code></li>
+</ul>
+<p><strong>Prometheus alert rules</strong> defined for:</p>
+<ul>
+<li>recall &lt; 0.80</li>
+<li>drift &gt; 0.2</li>
+<li>latency &gt; 0.5s</li>
+</ul>
+<p><strong>Grafana dashboards</strong>:</p>
+<ol>
+<li><strong>System Health</strong>: request rate, latency, error rate, CPU  </li>
+<li><strong>Model Performance</strong>: recall over time, precision, fraud detection rate, confidence distribution  </li>
+<li><strong>Data Drift</strong>: PSI scores, missing value rate, drift alert history  </li>
+</ol>
+<hr>
+<h2 id="task-7-drift-simulation">Task 7 — Drift Simulation</h2>
+<p>Drift was simulated using a <strong>time-based split on <code>TransactionDT</code></strong>. PSI analysis identified strongly drifted features consistent with temporal partitioning and identity/card dynamics.</p>
+<h3 id="top-drifted-features-psi">Top drifted features (PSI)</h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th style="text-align: right;">PSI</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TransactionID</td>
+<td style="text-align: right;">12.43</td>
+</tr>
+<tr>
+<td>TransactionDT</td>
+<td style="text-align: right;">12.43</td>
+</tr>
+<tr>
+<td>id_33</td>
+<td style="text-align: right;">12.42</td>
+</tr>
+<tr>
+<td>card4</td>
+<td style="text-align: right;">10.14</td>
+</tr>
+<tr>
+<td>id_30</td>
+<td style="text-align: right;">5.39</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Result</strong>: <code>should_retrain()</code> returned <strong>True</strong>.</p>
+<hr>
+<h2 id="task-8-retraining-strategy">Task 8 — Retraining Strategy</h2>
+<p>Three retraining strategies were compared to balance operational cost and model stability.</p>
+<h3 id="strategy-comparison">Strategy comparison</h3>
+<table>
+<thead>
+<tr>
+<th>Strategy</th>
+<th>Cost</th>
+<th>Stability</th>
+<th>Trigger logic</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Threshold-based</td>
+<td>medium cost</td>
+<td>medium stability</td>
+<td>triggers on metric drop</td>
+</tr>
+<tr>
+<td>Periodic</td>
+<td>high cost</td>
+<td>high stability</td>
+<td>fixed weekly schedule</td>
+</tr>
+<tr>
+<td>Hybrid (recommended)</td>
+<td>medium cost</td>
+<td>high stability</td>
+<td>combines emergency trigger with weekly schedule</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Recommendation</strong>: Hybrid (recommended).</p>
+<hr>
+<h2 id="task-9-explainability">Task 9 — Explainability</h2>
+<p>Model explainability was performed using <strong>TreeExplainer on XGBoost</strong>. Global SHAP analysis identified the features most influential to fraud prediction:</p>
+<ul>
+<li>Top features: <strong>C13 (most important)</strong>, C1, C14, TransactionAmt, V70, P_emaildomain</li>
+</ul>
+<p><strong>Interpretation</strong>: C13 represents behavioral aggregation signals most predictive of fraud, indicating that aggregated transaction behavior provides substantial discriminatory power beyond single raw fields. Such insights support both stakeholder communication and targeted feature monitoring for drift.</p>
+<hr>
+<h2 id="conclusion">Conclusion</h2>
+<p>This project demonstrates a complete MLOps workflow for fraud detection: pipeline tracking and orchestration, robust data preprocessing and encoding, comparative modeling, business-cost optimization, CI/CD automation, production-grade monitoring, drift-driven retraining triggers, and explainability. The MLflow implementation successfully replaces Kubeflow/KFP under realistic constraints while preserving rigorous experiment tracking and artifact management. Empirically, LightGBM achieved the best overall predictive performance among evaluated models, and cost-sensitive XGBoost produced a substantial reduction in estimated operational losses. The monitoring and drift simulation results further reinforce the need for continuous evaluation and a hybrid retraining strategy to sustain performance in dynamic fraud environments.</p>
+  </body>
+</html>
