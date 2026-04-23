@@ -37,4 +37,3 @@ def test_metrics_endpoint_exposes_prometheus():
     r = client.get("/metrics")
     assert r.status_code == 200
     assert "fraud_api_requests_total" in r.text
-

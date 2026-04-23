@@ -7,7 +7,7 @@ This repository is a complete (assignment-friendly) MLOps fraud detection system
 - **Cost-sensitive learning** and **business impact** analysis
 - **Drift detection** (PSI) and **intelligent retraining**
 - **FastAPI inference API** with **Prometheus metrics**
-- **Kubeflow Pipeline (KFP v2)** definition and compilation
+- **MLflow** experiment tracking and pipeline orchestration
 - **CI/CD** via GitHub Actions
 - **Monitoring assets** (Prometheus rules + Grafana dashboards)
 - **Notebooks** for modeling and explainability (SHAP)
@@ -140,21 +140,15 @@ Prometheus metrics exposed:
 
 ---
 
-## Kubeflow Pipeline (KFP v2)
+## MLflow Pipeline
 
-Pipeline definition:
+We use **MLflow** for experiment tracking and pipeline orchestration.
 
-- `pipelines/pipeline.py`
-
-Compile the pipeline:
+Run the pipeline:
 
 ```bash
-python pipelines/pipeline.py
+python mlflow_pipeline/mlflow_run.py
 ```
-
-Output:
-
-- `pipelines/fraud_pipeline.yaml`
 
 The pipeline includes a **conditional deploy** step that only runs when recall \(>\) 0.85.
 
@@ -170,7 +164,7 @@ Jobs:
 
 - `lint-and-test`: flake8 + pytest + validation smoke test
 - `build-docker`: builds and pushes Docker images to GHCR
-- `deploy-kubeflow`: compiles + triggers a Kubeflow pipeline run (requires secrets)
+- `deploy-mlflow`: runs the MLflow pipeline (requires secrets, if configured)
 - `intelligent-retrain`: manual trigger that runs drift + retraining (synthetic demo)
 
 ---

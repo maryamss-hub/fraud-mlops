@@ -175,4 +175,3 @@ def business_impact_analysis(
         "false_alarm_cost": false_alarm_cost,
         "total_cost": total,
     }
-

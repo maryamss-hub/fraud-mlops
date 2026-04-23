@@ -7,6 +7,9 @@ import os
 from datetime import date, datetime, timedelta
 from typing import Dict, Optional, Tuple
 
+import numpy as np
+import pandas as pd
+
 
 def threshold_based_retrain(current_recall: float, threshold: float = 0.80) -> bool:
     """Trigger retraining if recall drops below a threshold."""
@@ -188,4 +191,3 @@ def compare_strategies_report() -> list[dict[str, str]]:
     for r in rows:
         print(" | ".join(r[h].ljust(widths[h]) for h in headers))
     return rows
-

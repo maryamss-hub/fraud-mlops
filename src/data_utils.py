@@ -191,4 +191,3 @@ def time_based_train_test_split(
     if split_idx <= 0 or split_idx >= len(sorted_df):
         raise ValueError("train_ratio results in an empty train or test split")
     return sorted_df.iloc[:split_idx].copy(), sorted_df.iloc[split_idx:].copy()
-

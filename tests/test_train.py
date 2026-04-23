@@ -61,4 +61,3 @@ def test_compare_imbalance_strategies_returns_table(tmp_path, monkeypatch):
     assert "precision" in table.columns
     assert "recall" in table.columns
     assert table.shape[0] == 2
-

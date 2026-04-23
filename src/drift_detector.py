@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import Dict, Tuple
 
 import numpy as np
@@ -173,4 +172,3 @@ def should_retrain(
         if float(values.get("psi", 0.0)) > drift_threshold:
             return True
     return False
-

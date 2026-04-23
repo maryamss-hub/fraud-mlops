@@ -84,4 +84,3 @@ def test_time_based_train_test_split_chronological():
 def test_time_based_train_test_split_requires_column():
     with pytest.raises(ValueError):
         _ = time_based_train_test_split(pd.DataFrame({"x": [1, 2, 3]}))
-

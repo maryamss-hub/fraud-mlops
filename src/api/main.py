@@ -152,4 +152,3 @@ def metrics() -> Response:
     """Expose Prometheus metrics."""
     data = generate_latest()
     return Response(content=data, media_type=CONTENT_TYPE_LATEST)
-
